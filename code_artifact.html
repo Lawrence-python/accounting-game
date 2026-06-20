@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會計奇幻王國：開家屬於你的夢幻商店！</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for premium look -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for cute icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #fef9c3 0%, #fef3c7 50%, #fde68a 100%);
+            min-height: 100vh;
+        }
+        .title-font {
+            font-family: 'Fredoka One', 'Noto Sans TC', sans-serif;
+        }
+        /* Custom scrollbar for Glossary */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(253, 230, 138, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 10px;
+        }
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .floating-element {
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .bounce-gentle {
+            animation: bounce-gentle 2s ease-in-out infinite;
+        }
+        /* Pulse for target slots */
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.2); }
+            50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.4); }
+        }
+        .pulse-slot {
+            animation: pulse-border 2s infinite;
+        }
+        /* Sparkle effect */
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: radial-gradient(circle, #fff 10%, transparent 60%);
+            border-radius: 50%;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-slate-800 flex flex-col items-center justify-between min-h-screen selection:bg-amber-200">
+
+    <!-- Top Header -->
+    <header class="w-full max-w-5xl bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-xl border-2 border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+            <div class="bg-amber-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md floating-element">
+                <i class="fa-solid fa-calculator"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-amber-900 title-font flex items-center gap-2">
+                    會計奇幻王國
+                    <span class="text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded-full font-bold">小店長特訓</span>
+                </h1>
+                <p class="text-xs md:text-sm text-amber-700 font-semibold">對照參照「名詞解釋.png」50大核心觀念</p>
+            </div>
+        </div>
+        
+        <!-- Level Badges -->
+        <div class="flex items-center gap-2 bg-amber-100/60 p-1.5 rounded-2xl">
+            <button onclick="switchLevel(1)" id="btn-nav-1" class="px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all bg-amber-500 text-white shadow">
+                關卡一：黃金天平
+            </button>
+            <button onclick="switchLevel(2)" id="btn-nav-2" class="px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all text-amber-800 hover:bg-amber-200/50">
+                關卡二：商店日記
+            </button>
+            <button onclick="switchLevel(3)" id="btn-nav-3" class="px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all text-amber-800 hover:bg-amber-200/50">
+                關卡三：終極財報
+            </button>
+        </div>
+
+        <!-- Sidebar Glossary Button -->
+        <button onclick="toggleGlossary()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-2xl font-bold text-xs md:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
+            <i class="fa-solid fa-book-open"></i> 名詞魔法鏡
+        </button>
+    </header>
+
+    <main class="w-full max-w-5xl flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch mb-6">
+        
+        <!-- Game Area (Left 8 columns) -->
+        <div class="lg:col-span-8 bg-white/95 rounded-3xl shadow-xl border-2 border-amber-200 p-5 md:p-6 flex flex-col justify-between relative overflow-hidden min-h-[550px]">
+            
+            <!-- Confetti/Sparkle Canvas Container -->
+            <div id="particle-container" class="absolute inset-0 pointer-events-none z-50"></div>
+
+            <!-- LEVEL 1: THE GOLDEN BALANCE -->
+            <section id="level-1-container" class="level-section flex flex-col justify-between h-full">
+                <div>
+                    <span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold uppercase tracking-wide">任務一：黃金天平的秘密</span>
+                    <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">如何讓天平完美平衡？</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-4">會計最核心的秘密：<strong class="text-emerald-600 font-bold">資產 (你擁有的東西)</strong> 必須永遠等於 <strong class="text-blue-600 font-bold">負債 (你欠別人的錢)</strong> 加 <strong class="text-orange-600 font-bold">權益 (你自己和股東出的錢)</strong>！</p>
+                </div>
+
+                <!-- SVG Balance Scale Display -->
+                <div class="flex justify-center items-center my-6 py-4 bg-slate-50 rounded-2xl relative border border-slate-100 shadow-inner h-52">
+                    <svg id="balance-svg" viewBox="0 0 400 200" class="w-full max-w-sm transition-transform duration-500 ease-out" style="transform-origin: 200px 100px;">
+                        <!-- Stand (Fixed Base) -->
+                        <polygon points="180,180 220,180 205,100 195,100" fill="#a1a1aa" />
+                        <rect x="150" y="180" width="100" height="10" rx="3" fill="#71717a" />
+                        
+                        <!-- Center pivot dot -->
+                        <circle cx="200" cy="100" r="8" fill="#4b5563" />
+                        
+                        <!-- Rotating beam (Gears/Beam) -->
+                        <g id="scale-beam" class="transition-transform duration-300 ease-out" style="transform-origin: 200px 100px;">
+                            <line x1="80" y1="100" x2="320" y2="100" stroke="#f59e0b" stroke-width="8" stroke-linecap="round" />
+                            <circle cx="200" cy="100" r="4" fill="#ffffff" />
+                            
+                            <!-- Left Plate strings and plate (Assets) -->
+                            <line x1="80" y1="100" x2="50" y2="150" stroke="#10b981" stroke-width="2" />
+                            <line x1="80" y1="100" x2="110" y2="150" stroke="#10b981" stroke-width="2" />
+                            <path d="M40,150 L120,150 C120,165 40,165 40,150 Z" fill="#10b981" />
+                            <text x="80" y="145" text-anchor="middle" font-size="10" fill="#ffffff" font-weight="bold">資產 (左)</text>
+                            
+                            <!-- Right Plate strings and plate (Liabilities + Equity) -->
+                            <line x1="320" y1="100" x2="290" y2="150" stroke="#3b82f6" stroke-width="2" />
+                            <line x1="320" y1="100" x2="350" y2="150" stroke="#3b82f6" stroke-width="2" />
+                            <path d="M280,150 L360,150 C360,165 280,165 280,150 Z" fill="#3b82f6" />
+                            <text x="320" y="145" text-anchor="middle" font-size="9" fill="#ffffff" font-weight="bold">負債+權益 (右)</text>
+                        </g>
+                    </svg>
+                    
+                    <!-- Digital readout overlay -->
+                    <div class="absolute top-3 left-4 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl text-center">
+                        <span class="text-xs text-emerald-800 font-bold block">左盤 (資產)</span>
+                        <span id="txt-left-sum" class="text-lg font-black text-emerald-600">0萬</span>
+                    </div>
+                    <div class="absolute top-3 right-4 bg-blue-50 border border-blue-200 px-3 py-1 rounded-xl text-center">
+                        <span class="text-xs text-blue-800 font-bold block">右盤 (負債+權益)</span>
+                        <span id="txt-right-sum" class="text-lg font-black text-blue-600">0萬</span>
+                    </div>
+                </div>
+
+                <!-- Sliders panel -->
+                <div class="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div>
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span class="font-bold text-emerald-600 flex items-center gap-1.5">
+                                <i class="fa-solid fa-store"></i> 1. 購買商店資產 (現金與商品設備)
+                            </span>
+                            <span id="val-assets" class="bg-emerald-200 text-emerald-800 font-black px-2.5 py-0.5 rounded-lg text-xs">0萬</span>
+                        </div>
+                        <input type="range" id="slide-assets" min="0" max="200" value="100" step="10" class="w-full accent-emerald-500 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        <span class="text-[10px] text-slate-400">包含公司擁有的現金、進貨存貨(如iPhone)、裝潢設備等</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex justify-between items-center text-xs mb-1">
+                                <span class="font-bold text-blue-600 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-piggy-bank"></i> 2. 資金來源 A：跟銀行借 (負債)
+                                </span>
+                                <span id="val-liabilities" class="bg-blue-200 text-blue-800 font-black px-2 py-0.5 rounded-lg">0萬</span>
+                            </div>
+                            <input type="range" id="slide-liabilities" min="0" max="150" value="40" step="10" class="w-full accent-blue-500 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <span class="text-[10px] text-slate-400">公司欠別人的錢（如銀行借款、應付帳款）</span>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center text-xs mb-1">
+                                <span class="font-bold text-orange-600 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-tie"></i> 3. 資金來源 B：自己出的錢 (權益)
+                                </span>
+                                <span id="val-equity" class="bg-orange-200 text-orange-800 font-black px-2 py-0.5 rounded-lg">0萬</span>
+                            </div>
+                            <input type="range" id="slide-equity" min="0" max="150" value="30" step="10" class="w-full accent-orange-500 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                            <span class="text-[10px] text-slate-400">老闆自己投資入股的資本與保留盈餘</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check action -->
+                <div class="mt-4 flex items-center justify-between">
+                    <p class="text-xs text-slate-400 flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> 拉動滑桿，讓 左盤 = 右盤 即能過關！</p>
+                    <button onclick="checkLevel1()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                        驗證黃金天平 <i class="fa-solid fa-right-to-bracket"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- LEVEL 2: THE TRANSACTION DIARY -->
+            <section id="level-2-container" class="level-section flex flex-col justify-between h-full hidden">
+                <div>
+                    <span class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-bold uppercase tracking-wide">任務二：商店奇妙交易日記</span>
+                    <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">點擊魔法元素，記錄每天的交易！</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-4">每一筆交易都有「一體兩面」，請選擇資金的來龍去脈。這就是會計分錄的秘密！</p>
+                </div>
+
+                <!-- Transaction scenario and interactive panels -->
+                <div class="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl mb-4 relative">
+                    <div class="absolute -top-3 left-4 bg-indigo-500 text-white text-xs px-2.5 py-0.5 rounded-full font-bold">今日日記</div>
+                    <p id="t2-scenario" class="text-base font-bold text-indigo-900 mt-1 leading-relaxed">顧客捧著 100 元現金買了我們的招牌冰淇淋！</p>
+                    <p class="text-xs text-indigo-600 mt-1"><i class="fa-solid fa-quote-left"></i> 阿算提示：我們得到了現金（資產增加），也獲得了努力開張的營業回報（收入增加）。</p>
+                </div>
+
+                <!-- Interactive Choice grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <!-- Component A Slot -->
+                    <div class="bg-slate-50 border-2 border-dashed border-slate-300 p-4 rounded-2xl flex flex-col justify-between min-h-[140px]">
+                        <div>
+                            <span class="text-xs bg-slate-200 px-2 py-0.5 rounded font-bold text-slate-600">第一面：錢的實際去向/變動</span>
+                            <div id="slot-a-label" class="text-slate-400 text-xs italic mt-2">請從下方選擇對應的元素...</div>
+                        </div>
+                        <div id="slot-a-active" class="hidden bg-emerald-100 border border-emerald-300 p-3 rounded-xl flex items-center justify-between">
+                            <span class="font-bold text-emerald-800" id="slot-a-title">現金 (資產) 增加</span>
+                            <button onclick="clearSlot('A')" class="text-emerald-600 hover:text-emerald-900"><i class="fa-solid fa-circle-xmark"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Component B Slot -->
+                    <div class="bg-slate-50 border-2 border-dashed border-slate-300 p-4 rounded-2xl flex flex-col justify-between min-h-[140px]">
+                        <div>
+                            <span class="text-xs bg-slate-200 px-2 py-0.5 rounded font-bold text-slate-600">第二面：資金的來源/因果關係</span>
+                            <div id="slot-b-label" class="text-slate-400 text-xs italic mt-2">請從下方選擇對應的元素...</div>
+                        </div>
+                        <div id="slot-b-active" class="hidden bg-indigo-100 border border-indigo-300 p-3 rounded-xl flex items-center justify-between">
+                            <span class="font-bold text-indigo-800" id="slot-b-title">銷貨收入 (收入) 增加</span>
+                            <button onclick="clearSlot('B')" class="text-indigo-600 hover:text-indigo-900"><i class="fa-solid fa-circle-xmark"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SELECTABLE CHIPS -->
+                <div class="mb-4">
+                    <p class="text-xs font-bold text-slate-500 mb-2">可供選擇的會計元素：</p>
+                    <div class="flex flex-wrap gap-2" id="chip-container">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+
+                <!-- Progress indicators & navigation -->
+                <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                    <div class="flex items-center gap-1.5">
+                        <span id="t2-dot-0" class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                        <span id="t2-dot-1" class="w-3 h-3 rounded-full bg-slate-300"></span>
+                        <span id="t2-dot-2" class="w-3 h-3 rounded-full bg-slate-300"></span>
+                    </div>
+                    <button onclick="checkLevel2Transaction()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 py-2.5 rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                        確認記帳紀錄 <i class="fa-solid fa-pen-nib"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- LEVEL 3: FINANCIAL REPORT MAGIC MIRROR -->
+            <section id="level-3-container" class="level-section flex flex-col justify-between h-full hidden">
+                <div>
+                    <span class="text-xs bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-bold uppercase tracking-wide">任務三：終極財報魔法鏡</span>
+                    <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">拼裝屬於你的兩大財務報表！</h2>
+                    <p class="text-sm text-slate-500 mt-1 mb-4">將合適的名詞拼圖移到正確的財務報表中，看透公司「賺多少錢」以及「有多少資產負債」。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-3 flex-grow">
+                    <!-- Income Statement Box (損益表) -->
+                    <div class="bg-amber-50/60 border border-amber-200 rounded-2xl p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-amber-900 text-sm flex items-center gap-1"><i class="fa-solid fa-chart-line text-amber-600"></i> 1. 損益表 (Income Statement)</span>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">一定期間賺多少錢</span>
+                            </div>
+                            <p class="text-[11px] text-amber-700 mb-3 border-b border-amber-200/50 pb-1">營收減費用就是利潤的魔法！</p>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-xs font-semibold text-slate-500">公司收到的營業收入:</span>
+                                <div id="slot-l3-rev" onclick="selectSlotL3('rev')" class="w-36 h-9 rounded-xl border-2 border-dashed border-amber-300 bg-white/50 flex items-center justify-center text-xs font-bold text-amber-800 cursor-pointer hover:bg-amber-50 transition-all pulse-slot">
+                                    點擊放置
+                                </div>
+                            </div>
+                            <div class="text-center font-bold text-slate-400 text-xs">─ 扣掉 ─</div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-xs font-semibold text-slate-500">賺錢過程花掉的費用:</span>
+                                <div id="slot-l3-exp" onclick="selectSlotL3('exp')" class="w-36 h-9 rounded-xl border-2 border-dashed border-amber-300 bg-white/50 flex items-center justify-center text-xs font-bold text-amber-800 cursor-pointer hover:bg-amber-50 transition-all pulse-slot">
+                                    點擊放置
+                                </div>
+                            </div>
+                            <div class="text-center font-bold text-slate-400 text-xs">＝ 等於 ＝</div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-xs font-semibold text-slate-500">最後賺到的利益利潤:</span>
+                                <div id="slot-l3-profit" onclick="selectSlotL3('profit')" class="w-36 h-9 rounded-xl border-2 border-dashed border-amber-300 bg-white/50 flex items-center justify-center text-xs font-bold text-amber-800 cursor-pointer hover:bg-amber-50 transition-all pulse-slot">
+                                    點擊放置
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balance Sheet Box (資產負債表) -->
+                    <div class="bg-sky-50/60 border border-sky-200 rounded-2xl p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-sky-900 text-sm flex items-center gap-1"><i class="fa-solid fa-scale-balanced text-sky-600"></i> 2. 資產負債表 (Balance Sheet)</span>
+                                <span class="text-[10px] bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded font-bold">當下有多少財產與債務</span>
+                            </div>
+                            <p class="text-[11px] text-sky-700 mb-3 border-b border-sky-200/50 pb-1">記錄錢的最終狀態！</p>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-xs font-semibold text-slate-500">公司擁有的東西 (資產):</span>
+                                <div id="slot-l3-asset" onclick="selectSlotL3('asset')" class="w-36 h-9 rounded-xl border-2 border-dashed border-sky-300 bg-white/50 flex items-center justify-center text-xs font-bold text-sky-800 cursor-pointer hover:bg-sky-50 transition-all pulse-slot">
+                                    點擊放置
+                                </div>
+                            </div>
+                            <div class="text-center font-bold text-slate-400 text-xs">恆等於 (＝) 資金來源</div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-xs font-semibold text-slate-500">公司欠別人的錢 (負債):</span>
+                                <div id="slot-l3-liab" onclick="selectSlotL3('liab')" class="w-36 h-9 rounded-xl border-2 border-dashed border-sky-300 bg-white/50 flex items-center justify-center text-xs font-bold text-sky-800 cursor-pointer hover:bg-sky-50 transition-all pulse-slot">
+                                    點擊放置
+                                </div>
+                            </div>
+                            <div class="text-center font-bold text-slate-300 text-[10px]">加上 (+)</div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-xs font-semibold text-slate-500">股東與老闆投資的 (權益):</span>
+                                <div id="slot-l3-eq" onclick="selectSlotL3('eq')" class="w-36 h-9 rounded-xl border-2 border-dashed border-sky-300 bg-white/50 flex items-center justify-center text-xs font-bold text-sky-800 cursor-pointer hover:bg-sky-50 transition-all pulse-slot">
+                                    點擊放置
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SELECTABLE PUZZLES -->
+                <div class="mb-4">
+                    <p class="text-xs font-bold text-slate-500 mb-1.5 flex justify-between">
+                        <span>可選的名詞磁鐵（點擊再點擊上方虛線框可放入）：</span>
+                        <button onclick="resetLevel3()" class="text-[10px] text-red-500 hover:underline"><i class="fa-solid fa-rotate"></i> 全部重來</button>
+                    </p>
+                    <div id="l3-tiles-pool" class="flex flex-wrap gap-2">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between pt-1">
+                    <p class="text-[10px] text-slate-400 flex items-center gap-1"><i class="fa-solid fa-wand-magic-sparkles"></i> 拼完兩張神奇報表後即可解鎖神級小店長！</p>
+                    <button onclick="checkLevel3()" class="bg-purple-600 hover:bg-purple-700 text-white font-black px-6 py-2.5 rounded-2xl shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                        啟動魔法鏡驗收 <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Helper Cat Panel "阿算" (Right 4 columns) -->
+        <div class="lg:col-span-4 flex flex-col justify-between gap-6">
+            
+            <!-- Abacus Cat Dialog Bubble -->
+            <div class="bg-white/95 rounded-3xl p-5 shadow-xl border-2 border-amber-200 flex flex-col justify-between relative flex-grow min-h-[220px]">
+                <div>
+                    <div class="flex items-center gap-3 border-b border-amber-100 pb-3 mb-3">
+                        <div class="relative">
+                            <span class="absolute bottom-0 right-0 bg-green-500 w-3.5 h-3.5 rounded-full border-2 border-white"></span>
+                            <div id="cat-avatar" class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-amber-200">
+                                🐱
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-amber-900 text-sm flex items-center gap-1">
+                                神奇店貓阿算
+                                <span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded font-bold">導師</span>
+                            </h3>
+                            <p class="text-[10px] text-slate-400">「記帳不煩惱，有貓萬事足！」</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Bubble Text Content -->
+                    <div class="relative bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                        <p id="cat-bubble" class="text-sm font-semibold text-slate-700 leading-relaxed">
+                            哈囉！我是大掌櫃阿算。歡迎來到我的奇妙小店。要開張大吉，首先要理解「黃金天平」的奧秘。快去調整下方的滑桿試試看吧！
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Fun Interactive Quote / Mini Task status -->
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-400">目前進度:</span>
+                    <span id="txt-quest-status" class="bg-amber-500/10 text-amber-700 px-2 py-1 rounded-full font-bold">1 / 3 關卡挑戰中</span>
+                </div>
+            </div>
+
+            <!-- Mini Scoreboard or Quick Tips -->
+            <div class="bg-indigo-900 text-white rounded-3xl p-5 shadow-xl flex flex-col justify-between h-[180px] relative overflow-hidden">
+                <!-- Background visual -->
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-8xl"><i class="fa-solid fa-coins"></i></div>
+                
+                <div>
+                    <h4 class="font-bold text-indigo-200 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-trophy text-amber-400"></i> 小店長成就榜
+                    </h4>
+                    <div class="mt-3 space-y-2">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-indigo-200">完成天平平衡：</span>
+                            <span id="badge-c1" class="text-xs bg-red-500/50 text-white px-2 py-0.5 rounded-full font-bold">未解鎖 🔒</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-indigo-200">完成日記分錄：</span>
+                            <span id="badge-c2" class="text-xs bg-red-500/50 text-white px-2 py-0.5 rounded-full font-bold">未解鎖 🔒</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-indigo-200">編製精準財報：</span>
+                            <span id="badge-c3" class="text-xs bg-red-500/50 text-white px-2 py-0.5 rounded-full font-bold">未解鎖 🔒</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-indigo-300 border-t border-indigo-800 pt-2 flex items-center justify-between">
+                    <span>會計核心：錢從哪裡來，花去哪裡？</span>
+                    <span class="text-amber-400 font-bold">對齊平衡 🌟</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- SLIDE-OUT GLOSSARY DIALOGUE (魔法鏡) -->
+    <div id="glossary-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all opacity-0 pointer-events-none duration-300">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border-2 border-indigo-200 transform scale-95 transition-transform duration-300">
+            
+            <!-- Header -->
+            <div class="p-5 border-b border-indigo-100 flex justify-between items-center bg-indigo-50 rounded-t-3xl">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📖</span>
+                    <div>
+                        <h3 class="font-black text-indigo-900 text-lg">《名詞解釋.png》掌上對照魔法書</h3>
+                        <p class="text-xs text-indigo-600 font-semibold">50個核心會計名詞，隨查隨懂！</p>
+                    </div>
+                </div>
+                <button onclick="toggleGlossary()" class="w-8 h-8 rounded-full bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Content (Accordion structure of the image) -->
+            <div class="p-5 overflow-y-auto flex-grow space-y-4 text-sm">
+                
+                <!-- Category 1: Assets -->
+                <div class="border border-emerald-200 rounded-2xl overflow-hidden">
+                    <div class="bg-emerald-50 p-3 font-bold text-emerald-800 flex items-center justify-between">
+                        <span>第一層：公司有什麼（資產 Assets）</span>
+                        <span class="text-xs bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">1 ~ 5 名詞</span>
+                    </div>
+                    <div class="p-3 bg-white space-y-2.5">
+                        <div>
+                            <strong class="text-slate-800">1. 資產 (Assets):</strong> 公司擁有的東西 (如現金、存貨、機器、土地)。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">2. 現金 (Cash):</strong> 戶頭與手上的錢 (公司戶頭有100萬元)。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">3. 應收帳款 (Accounts Receivable):</strong> 客戶欠公司的錢。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">4. 存貨 (Inventory):</strong> 倉庫裡的待售商品 (如倉庫裡的 iPhone)。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">5. 設備 (Equipment):</strong> 開店辦公的機器 (如辦公電腦、生產線)。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 2: Liabilities -->
+                <div class="border border-blue-200 rounded-2xl overflow-hidden">
+                    <div class="bg-blue-50 p-3 font-bold text-blue-800 flex items-center justify-between">
+                        <span>第二層：公司欠什麼（負債 Liabilities）</span>
+                        <span class="text-xs bg-blue-100 text-blue-900 px-2 py-0.5 rounded">6 ~ 9 名詞</span>
+                    </div>
+                    <div class="p-3 bg-white space-y-2.5">
+                        <div>
+                            <strong class="text-slate-800">6. 負債 (Liabilities):</strong> 公司欠別人的錢。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">7. 應付帳款 (Accounts Payable):</strong> 公司欠供應商的錢。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">8. 銀行借款 (Loan):</strong> 向銀行借的錢。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">9. 應付公司債 (Bond Payable):</strong> 向投資人借入的錢。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 3: Equity -->
+                <div class="border border-orange-200 rounded-2xl overflow-hidden">
+                    <div class="bg-orange-50 p-3 font-bold text-orange-800 flex items-center justify-between">
+                        <span>第三層：股東有多少錢（權益 Equity）</span>
+                        <span class="text-xs bg-orange-100 text-orange-900 px-2 py-0.5 rounded">10 ~ 17 名詞</span>
+                    </div>
+                    <div class="p-3 bg-white space-y-2.5">
+                        <div>
+                            <span class="text-xs bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded">重要公式:</span> <strong class="text-slate-800">資產 - 負債 = 權益</strong>
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">10. 權益 (Equity):</strong> 股東擁有的剩餘價值。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">11. 股本 (Capital Stock):</strong> 創業最初投入的錢 (例如創業投入100元)。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">13. 保留盈餘 (Retained Earnings):</strong> 賺了100萬沒發分掉、留在公司繼續營運的錢。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 4: Income Statement -->
+                <div class="border border-purple-200 rounded-2xl overflow-hidden">
+                    <div class="bg-purple-50 p-3 font-bold text-purple-800 flex items-center justify-between">
+                        <span>第四層：公司怎麼賺錢（損益項目）</span>
+                        <span class="text-xs bg-purple-100 text-purple-900 px-2 py-0.5 rounded">18 ~ 27 名詞</span>
+                    </div>
+                    <div class="p-3 bg-white space-y-2.5">
+                        <div>
+                            <strong class="text-slate-800">18. 收入 (Revenue):</strong> 公司收到的營業收入。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">19. 銷貨收入 (Sales Revenue):</strong> 賣手機/商品賺手的錢。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">20. 費用 (Expense):</strong> 賺錢過程花掉的錢。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">22. 租金費用 (Rent Expense):</strong> 租辦公室每月付的租金。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">24. 利潤 (Profit):</strong> 收入 - 費用 = 利潤。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 5: Financial Statements -->
+                <div class="border border-amber-200 rounded-2xl overflow-hidden">
+                    <div class="bg-amber-50 p-3 font-bold text-amber-800 flex items-center justify-between">
+                        <span>第五層：四大財務報表</span>
+                        <span class="text-xs bg-amber-100 text-amber-900 px-2 py-0.5 rounded">28 ~ 31 名詞</span>
+                    </div>
+                    <div class="p-3 bg-white space-y-2.5">
+                        <div>
+                            <strong class="text-slate-800">28. 資產負債表 (Balance Sheet):</strong> 公司有多少財產、欠多少債。
+                        </div>
+                        <div>
+                            <strong class="text-slate-800">29. 損益表 (Income Statement):</strong> 一定期間內公司賺了多少錢。
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 bg-slate-50 rounded-b-3xl border-t border-indigo-100 flex justify-between items-center text-xs text-slate-400">
+                <span>根據「名詞解釋.png」編製</span>
+                <span class="font-bold text-indigo-600">隨時查閱，遊戲過關更容易！</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS CELEBRATION MODAL -->
+    <div id="success-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border-4 border-amber-400 transform scale-95 transition-transform duration-300">
+            <span class="text-6xl block mb-2 floating-element">👑</span>
+            <h3 class="text-2xl font-black text-amber-950 mb-2" id="modal-success-title">完美達成！</h3>
+            <p class="text-sm text-slate-600 mb-6" id="modal-success-text">你已經參透了黃金天平的魔法奧秘！</p>
+            
+            <button onclick="dismissSuccessModal()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black py-3 rounded-2xl shadow-md hover:shadow-lg transition-all transform hover:scale-105">
+                前往下一階段 ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Credits -->
+    <footer class="w-full max-w-5xl mt-6 text-center text-slate-500 text-xs">
+        <p class="mb-1">「會計就是把複雜的東西變簡單。」</p>
+        <p class="font-semibold text-slate-400">© 2026 會計奇幻王國互動開發版 - 為大人與孩子量身打造的探索工具</p>
+    </footer>
+
+    <script>
+        // Audio sound synthesizers (using Web Audio API for 0 lag, neat sound effects)
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'success') {
+                    // Quick nice arpeggio
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3); // C6
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.5);
+                } else if (type === 'error') {
+                    // Sad downward slide
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.log("Audio play failed, normal for user gesture prevention.");
+            }
+        }
+
+        // --- STATE MANAGEMENT ---
+        let currentLevel = 1;
+        let unlockedLevels = [1];
+        
+        // Level 1 States
+        const slideAssets = document.getElementById('slide-assets');
+        const slideLiabilities = document.getElementById('slide-liabilities');
+        const slideEquity = document.getElementById('slide-equity');
+        
+        // Level 2 States
+        let currentL2Index = 0;
+        let l2SelectionA = null;
+        let l2SelectionB = null;
+        
+        const l2Transactions = [
+            {
+                scenario: "顧客捧著 100 元現金，買了我們的招牌冰淇淋！這筆「銷貨收入」完成了！",
+                hint: "得到有價值的錢是『資產』增加；而我們付出服務賺到了『收入』！",
+                chips: [
+                    { id: 'asset_up', text: "現金 (資產) 增加", side: 'A' },
+                    { id: 'rev_up', text: "銷貨收入 (收入) 增加", side: 'B' },
+                    { id: 'liab_up', text: "銀行借款 (負債) 增加", side: 'B' },
+                    { id: 'exp_up', text: "租金費用 (費用) 增加", side: 'A' }
+                ],
+                correctA: 'asset_up',
+                correctB: 'rev_up',
+                successMsg: "太棒了！營業收入增加的同時，店裡也收到了實實在在的『現金』！這就是有借必有貸、會計對齊的魔法！",
+                failMsg: "哎呀！冰淇淋被拿走了，但我們得到的不是負債或付費用喔！仔細想想，冰櫃裡收到了什麼？這筆錢又是怎麼賺進來的？"
+            },
+            {
+                scenario: "店鋪需要租金！月底到了，老闆從小金庫拿出 30 元付給了房東（租金費用）。",
+                hint: "錢變少了代表『資產』減少；而付出的租金就是『費用』增加！",
+                chips: [
+                    { id: 'asset_down', text: "現金 (資產) 減少", side: 'B' },
+                    { id: 'exp_up', text: "租金費用 (費用) 增加", side: 'A' },
+                    { id: 'equity_down', text: "保留盈餘 減少", side: 'A' },
+                    { id: 'liab_up', text: "銀行借款 增加", side: 'B' }
+                ],
+                correctA: 'exp_up',
+                correctB: 'asset_down',
+                successMsg: "答對了！租金費用增加代表成本產生，而手上的現金資產則隨之減少。阿算覺得房東今天笑得很燦爛！",
+                failMsg: "唔，房東拿到錢了，所以我們手頭上的『現金資產』肯定減少了。另外，付房租是屬於一種『費用』喔！"
+            },
+            {
+                scenario: "為了裝修可愛的貓咪遊樂區，我們向銀行借了 80 元，銀行當場將現金匯入公司戶頭。",
+                hint: "跟銀行借錢會得到『現金（資產增加）』，但同時公司也欠了銀行『借款（負債增加）』！",
+                chips: [
+                    { id: 'asset_up', text: "現金 (資產) 增加", side: 'A' },
+                    { id: 'liab_up', text: "銀行借款 (負債) 增加", side: 'B' },
+                    { id: 'rev_up', text: "營業收入 增加", side: 'A' },
+                    { id: 'equity_up', text: "股本 增加", side: 'B' }
+                ],
+                correctA: 'asset_up',
+                correctB: 'liab_up',
+                successMsg: "非常精準！這就是典型的負債籌資！你得到了裝修金（現金），但也背負了對銀行的還款承諾（負債）。",
+                failMsg: "噢！銀行可沒有平白送錢（這不是收入），借來的錢終究要還的（是負債）。趕快重新調整一下！"
+            }
+        ];
+
+        // Level 3 States
+        let l3SelectedTile = null;
+        let l3Slots = {
+            rev: null,
+            exp: null,
+            profit: null,
+            asset: null,
+            liab: null,
+            eq: null
+        };
+        const l3Tiles = [
+            { id: 't_rev', text: "銷貨收入", category: 'rev' },
+            { id: 't_exp', text: "租金費用", category: 'exp' },
+            { id: 't_profit', text: "最後淨利", category: 'profit' },
+            { id: 't_asset', text: "現金與存貨", category: 'asset' },
+            { id: 't_liab', text: "銀行借款", category: 'liab' },
+            { id: 't_eq', text: "老闆的股本", category: 'eq' }
+        ];
+
+        // --- GAME SYSTEM INITS ---
+        window.onload = function() {
+            // Setup slider listeners
+            [slideAssets, slideLiabilities, slideEquity].forEach(slider => {
+                slider.addEventListener('input', updateScaleFromSliders);
+            });
+
+            // Initialize Level 1 scale display
+            updateScaleFromSliders();
+            
+            // Build Level 2
+            loadL2Transaction();
+            
+            // Build Level 3
+            renderL3TilesPool();
+        };
+
+        // --- LEVEL 1 LOGIC ---
+        function updateScaleFromSliders() {
+            const assetsVal = parseInt(slideAssets.value);
+            const liabilitiesVal = parseInt(slideLiabilities.value);
+            const equityVal = parseInt(slideEquity.value);
+            
+            // Update labels
+            document.getElementById('val-assets').innerText = `${assetsVal} 萬`;
+            document.getElementById('val-liabilities').innerText = `${liabilitiesVal} 萬`;
+            document.getElementById('val-equity').innerText = `${equityVal} 萬`;
+            
+            // Update Digital Readouts
+            const leftSum = assetsVal;
+            const rightSum = liabilitiesVal + equityVal;
+            document.getElementById('txt-left-sum').innerText = `${leftSum} 萬`;
+            document.getElementById('txt-right-sum').innerText = `${rightSum} 萬`;
+            
+            // Calculate physics angle
+            // Left (Assets) vs Right (Liab + Equity)
+            const diff = leftSum - rightSum;
+            // Map the difference to an angle between -22 and 22 degrees
+            let angle = diff * 0.4;
+            if (angle > 22) angle = 22;
+            if (angle < -22) angle = -22;
+            
+            // Apply rotation to beam
+            const beam = document.getElementById('scale-beam');
+            beam.style.transform = `rotate(${angle}deg)`;
+            
+            // Update cat comment depending on status
+            const catBubble = document.getElementById('cat-bubble');
+            const catAvatar = document.getElementById('cat-avatar');
+            
+            if (diff === 0 && leftSum > 0) {
+                catAvatar.innerText = "😺";
+                catBubble.innerText = "阿算：天平完美平衡了！太神了！這就是會計的核心：『資產 = 負債 + 權益』！趕快點右下角的驗證按鈕前進下一關吧！";
+            } else if (leftSum === 0 && rightSum === 0) {
+                catAvatar.innerText = "🥱";
+                catBubble.innerText = "阿算：店裡空蕩蕩的... 什麼資產和資金都沒有，快用滑桿投資一點資金來開張吧！";
+            } else if (diff > 0) {
+                catAvatar.innerText = "🙀";
+                catBubble.innerText = `阿算：哦不！天平往左傾斜了！你的『資產 (${leftSum}萬)』比『資金來源 (${rightSum}萬)』還多！這些多出來的財產難道是魔法變出來的嗎？快去借貸 (負債) 或投資 (權益) 補足吧！`;
+            } else {
+                catAvatar.innerText = "😾";
+                catBubble.innerText = `阿算：天平往右邊倒啦！你籌集了『${rightSum}萬』的資金，但左邊卻只有『${leftSum}萬』的資產！錢不能憑空蒸發啊，快把剩下的錢拿去放手頭『現金』或採購『設備存貨』！`;
+            }
+        }
+
+        function checkLevel1() {
+            playSound('click');
+            const assetsVal = parseInt(slideAssets.value);
+            const liabilitiesVal = parseInt(slideLiabilities.value);
+            const equityVal = parseInt(slideEquity.value);
+            
+            if (assetsVal === (liabilitiesVal + equityVal) && assetsVal > 0) {
+                triggerSuccessCelebration(
+                    "🎉 恭喜通過：黃金天平的考驗！",
+                    `你成功配置了：資產 ${assetsVal} 萬 = 負債 ${liabilitiesVal} 萬 + 權益 ${equityVal} 萬！店貓阿算對你露出了讚許的微笑。`,
+                    () => {
+                        unlockLevel(2);
+                        switchLevel(2);
+                    }
+                );
+            } else if (assetsVal === 0) {
+                playSound('error');
+                showCatMessage("😾 阿算：不要拿空空的店來敷衍我呀！快點調大滑桿，放點資金和資產進去玩玩！");
+            } else {
+                playSound('error');
+                showCatMessage("❌ 天平還沒有平衡喔！再微調一下滑桿，一定要讓『左邊等於右邊』才能啟動魔法印記！");
+            }
+        }
+
+        // --- LEVEL 2 LOGIC (TRANSACTION DIARY) ---
+        function loadL2Transaction() {
+            const step = l2Transactions[currentL2Index];
+            
+            // Set scenario text
+            document.getElementById('t2-scenario').innerHTML = step.scenario;
+            
+            // Reset slots
+            l2SelectionA = null;
+            l2SelectionB = null;
+            updateL2SlotsUI();
+            
+            // Build choice chips
+            const chipContainer = document.getElementById('chip-container');
+            chipContainer.innerHTML = '';
+            
+            step.chips.forEach(chip => {
+                const button = document.createElement('button');
+                button.className = "bg-white hover:bg-amber-100 border-2 border-slate-200 px-3 py-2 rounded-xl text-xs font-bold shadow-sm hover:shadow transition-all active:scale-95";
+                button.innerText = chip.text;
+                button.onclick = () => selectL2Chip(chip);
+                chipContainer.appendChild(button);
+            });
+            
+            // Update dot indicators
+            for (let i = 0; i < 3; i++) {
+                const dot = document.getElementById(`t2-dot-${i}`);
+                if (i === currentL2Index) {
+                    dot.className = "w-3 h-3 rounded-full bg-indigo-600 animate-bounce";
+                } else if (i < currentL2Index) {
+                    dot.className = "w-3 h-3 rounded-full bg-green-500";
+                } else {
+                    dot.className = "w-3 h-3 rounded-full bg-slate-300";
+                }
+            }
+        }
+
+        function selectL2Chip(chip) {
+            playSound('click');
+            if (chip.side === 'A') {
+                l2SelectionA = chip;
+            } else {
+                l2SelectionB = chip;
+            }
+            updateL2SlotsUI();
+        }
+
+        function clearSlot(side) {
+            playSound('click');
+            if (side === 'A') {
+                l2SelectionA = null;
+            } else {
+                l2SelectionB = null;
+            }
+            updateL2SlotsUI();
+        }
+
+        function updateL2SlotsUI() {
+            const slotALabel = document.getElementById('slot-a-label');
+            const slotAActive = document.getElementById('slot-a-active');
+            const slotATitle = document.getElementById('slot-a-title');
+
+            const slotBLabel = document.getElementById('slot-b-label');
+            const slotBActive = document.getElementById('slot-b-active');
+            const slotBTitle = document.getElementById('slot-b-title');
+
+            if (l2SelectionA) {
+                slotALabel.classList.add('hidden');
+                slotAActive.classList.remove('hidden');
+                slotATitle.innerText = l2SelectionA.text;
+            } else {
+                slotALabel.classList.remove('hidden');
+                slotAActive.classList.add('hidden');
+            }
+
+            if (l2SelectionB) {
+                slotBLabel.classList.add('hidden');
+                slotBActive.classList.remove('hidden');
+                slotBTitle.innerText = l2SelectionB.text;
+            } else {
+                slotBLabel.classList.remove('hidden');
+                slotBActive.classList.add('hidden');
+            }
+        }
+
+        function checkLevel2Transaction() {
+            const step = l2Transactions[currentL2Index];
+            
+            if (!l2SelectionA || !l2SelectionB) {
+                playSound('error');
+                showCatMessage("🙀 阿算：哎呀！日記的『第一面（去向）』跟『第二面（來源）』都必須填上才算完成喔。快把下面合適的磁鐵貼上去！");
+                return;
+            }
+
+            if (l2SelectionA.id === step.correctA && l2SelectionB.id === step.correctB) {
+                playSound('success');
+                // Proceed to next transaction or complete level 2
+                if (currentL2Index < l2Transactions.length - 1) {
+                    showCatMessage("😼 阿算讚道：對了！就是這樣。你非常有記帳的天賦。讓我們來看看明天的挑戰吧！");
+                    currentL2Index++;
+                    setTimeout(() => {
+                        loadL2Transaction();
+                    }, 2500);
+                } else {
+                    // Level 2 Complete!
+                    triggerSuccessCelebration(
+                        "📝 順利完成：商店奇妙日記！",
+                        "你成功幫店鋪完成了全部的三天分錄，店裡的帳目清清楚楚！阿算貓爪啪啪啪為你鼓掌！",
+                        () => {
+                            unlockLevel(3);
+                            switchLevel(3);
+                        }
+                    );
+                }
+            } else {
+                playSound('error');
+                // Humorous hints
+                showCatMessage("🧙‍♂️ 阿算：" + step.failMsg);
+            }
+        }
+
+        // --- LEVEL 3 LOGIC (FINANCIAL REPORTS) ---
+        function renderL3TilesPool() {
+            const pool = document.getElementById('l3-tiles-pool');
+            pool.innerHTML = '';
+            
+            l3Tiles.forEach(tile => {
+                // Check if this tile is already placed in a slot
+                const isPlaced = Object.values(l3Slots).includes(tile.id);
+                if (isPlaced) return; // Hide from pool if placed
+
+                const button = document.createElement('button');
+                // Match visual style based on potential categories
+                let btnStyle = "bg-white border-2 border-slate-200 text-slate-700 hover:border-indigo-400";
+                if (l3SelectedTile === tile.id) {
+                    btnStyle = "bg-indigo-500 text-white border-2 border-indigo-600 animate-pulse";
+                }
+
+                button.className = `${btnStyle} px-3 py-2 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 flex items-center gap-1`;
+                button.innerHTML = `📌 ${tile.text}`;
+                button.onclick = () => selectL3Tile(tile.id);
+                pool.appendChild(button);
+            });
+        }
+
+        function selectL3Tile(tileId) {
+            playSound('click');
+            if (l3SelectedTile === tileId) {
+                l3SelectedTile = null; // Unselect
+            } else {
+                l3SelectedTile = tileId;
+            }
+            renderL3TilesPool();
+        }
+
+        function selectSlotL3(slotName) {
+            playSound('click');
+            // If a tile is selected, place it into this slot
+            if (l3SelectedTile) {
+                // Clear the slot if it had something previously
+                if (l3Slots[slotName]) {
+                    // Just overwrite, previous tile will go back to pool
+                }
+                
+                l3Slots[slotName] = l3SelectedTile;
+                l3SelectedTile = null; // Reset selection
+                updateL3SlotsUI();
+                renderL3TilesPool();
+            } else {
+                // If no tile selected, clicking slot clears it
+                if (l3Slots[slotName]) {
+                    l3Slots[slotName] = null;
+                    updateL3SlotsUI();
+                    renderL3TilesPool();
+                } else {
+                    showCatMessage("🐱 阿算：請先在下方點擊選擇一塊『名詞磁鐵』，再點擊這個虛線框把它放進來唷！");
+                }
+            }
+        }
+
+        function updateL3SlotsUI() {
+            // Update the display text for each slot
+            for (const [slotKey, tileId] of Object.entries(l3Slots)) {
+                const slotEl = document.getElementById(`slot-l3-${slotKey}`);
+                if (tileId) {
+                    const tileObj = l3Tiles.find(t => t.id === tileId);
+                    slotEl.innerText = tileObj.text;
+                    slotEl.className = "w-36 h-9 rounded-xl border-2 border-solid border-emerald-500 bg-emerald-50 flex items-center justify-center text-xs font-extrabold text-emerald-900 cursor-pointer shadow-sm";
+                } else {
+                    slotEl.innerText = "點擊放置";
+                    slotEl.className = "w-36 h-9 rounded-xl border-2 border-dashed border-slate-300 bg-white/50 flex items-center justify-center text-xs font-bold text-slate-400 cursor-pointer hover:bg-slate-50 transition-all pulse-slot";
+                }
+            }
+        }
+
+        function resetLevel3() {
+            playSound('click');
+            l3SelectedTile = null;
+            l3Slots = { rev: null, exp: null, profit: null, asset: null, liab: null, eq: null };
+            updateL3SlotsUI();
+            renderL3TilesPool();
+            showCatMessage("🧙‍♂️ 阿算：魔法陣已經重置！深呼吸，讓我們一塊一塊對號入座。");
+        }
+
+        function checkLevel3() {
+            playSound('click');
+            // Validate all slots filled
+            const emptySlots = Object.entries(l3Slots).filter(([k, v]) => v === null);
+            if (emptySlots.length > 0) {
+                playSound('error');
+                showCatMessage("🙀 阿算：魔法鏡上還有空的格子呀！這樣報表可就殘缺不全了。快把它們補滿吧！");
+                return;
+            }
+
+            // Correct match definitions
+            const correctMapping = {
+                rev: 't_rev',
+                exp: 't_exp',
+                profit: 't_profit',
+                asset: 't_asset',
+                liab: 't_liab',
+                eq: 't_eq'
+            };
+
+            let isCorrect = true;
+            for (const [key, correctId] of Object.entries(correctMapping)) {
+                if (l3Slots[key] !== correctId) {
+                    isCorrect = false;
+                }
+            }
+
+            if (isCorrect) {
+                playSound('success');
+                // Trigger final game complete
+                triggerSuccessCelebration(
+                    "👑 終極成就：神級小店長誕生！",
+                    "恭喜你！你已經看懂了兩大財務報表！店貓阿算正式頒發『黃金特許店長勳章』給你，你現在可以驕傲地開拓你的商業帝國了！",
+                    () => {
+                        showGameCompletion();
+                    }
+                );
+            } else {
+                playSound('error');
+                showCatMessage("🔮 阿算嘀咕：報表的邏輯好像有點錯位了呢。記住：損益表是「收入 - 費用 = 淨利」；資產負債表是「資產 = 負債 + 權益」。仔細把他們調整到對的位置吧！");
+            }
+        }
+
+        // --- NAVIGATION & UI GENERAL ---
+        function switchLevel(levelNum) {
+            playSound('click');
+            if (!unlockedLevels.includes(levelNum)) {
+                showCatMessage("🔒 阿算：等等！後面的魔法陣還沒解鎖呢。要先完成前面的挑戰喔！");
+                return;
+            }
+
+            currentLevel = levelNum;
+            
+            // Toggle container classes
+            document.querySelectorAll('.level-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`level-${levelNum}-container`).classList.remove('hidden');
+            
+            // Toggle active menu button styling
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`btn-nav-${i}`);
+                if (i === levelNum) {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all bg-amber-500 text-white shadow";
+                } else if (unlockedLevels.includes(i)) {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all text-amber-800 hover:bg-amber-200/50";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-xl text-xs md:text-sm font-bold transition-all text-slate-400 cursor-not-allowed";
+                }
+            }
+
+            // Update dialogue and status
+            const catBubble = document.getElementById('cat-bubble');
+            document.getElementById('txt-quest-status').innerText = `${levelNum} / 3 關卡挑戰中`;
+
+            if (levelNum === 1) {
+                catBubble.innerText = "阿算：我們又回到黃金天平前了。動手調一調，感受『資產 = 負債 + 權益』的神奇平衡律。";
+            } else if (levelNum === 2) {
+                catBubble.innerText = "阿算：太棒了！歡迎來到商店日記挑戰。我們一天一天把日常事件記錄到會計的世界裡。";
+                loadL2Transaction();
+            } else if (levelNum === 3) {
+                catBubble.innerText = "阿算：最後考驗來了！這是在財務報表上給磁鐵定位。利用你對名詞的理解，把拼圖貼到合適的表上吧！";
+            }
+        }
+
+        function unlockLevel(levelNum) {
+            if (!unlockedLevels.includes(levelNum)) {
+                unlockedLevels.push(levelNum);
+                // Update navigation visual locks
+                const btn = document.getElementById(`btn-nav-${levelNum}`);
+                btn.classList.remove('text-slate-400', 'cursor-not-allowed');
+                btn.classList.add('text-amber-800', 'hover:bg-amber-200/50');
+                
+                // Update scoreboards
+                document.getElementById(`badge-c${levelNum - 1}`).innerText = "已解鎖 ✨";
+                document.getElementById(`badge-c${levelNum - 1}`).className = "text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold";
+            }
+        }
+
+        function showCatMessage(text) {
+            document.getElementById('cat-bubble').innerText = text;
+            // Add bounce dynamic to cat avatar
+            const catAv = document.getElementById('cat-avatar');
+            catAv.classList.add('bounce-gentle');
+            setTimeout(() => {
+                catAv.classList.remove('bounce-gentle');
+            }, 1000);
+        }
+
+        // --- CELEBRATION EFFECTS ---
+        let currentModalCallback = null;
+
+        function triggerSuccessCelebration(title, text, callback) {
+            playSound('success');
+            
+            // Set modal content
+            document.getElementById('modal-success-title').innerText = title;
+            document.getElementById('modal-success-text').innerText = text;
+            currentModalCallback = callback;
+
+            // Show modal with animation
+            const modal = document.getElementById('success-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+
+            // Generate some sparkles
+            createSparkles();
+        }
+
+        function dismissSuccessModal() {
+            playSound('click');
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('scale-95');
+            modal.querySelector('div').classList.remove('scale-100');
+
+            if (currentModalCallback) {
+                currentModalCallback();
+                currentModalCallback = null;
+            }
+        }
+
+        function createSparkles() {
+            const container = document.getElementById('particle-container');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'sparkle';
+                
+                // Randomize positions, colors and offsets
+                const x = window.innerWidth / 2;
+                const y = window.innerHeight / 2 - 100;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 150;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                const size = 6 + Math.random() * 12;
+                const hue = Math.floor(Math.random() * 360);
+                
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                
+                container.appendChild(particle);
+                
+                // Clean up
+                setTimeout(() => {
+                    particle.remove();
+                }, 800);
+            }
+        }
+
+        function showGameCompletion() {
+            // Unlock all badges
+            document.getElementById('badge-c3').innerText = "大師解鎖 🏆";
+            document.getElementById('badge-c3').className = "text-xs bg-purple-500 text-white px-2 py-0.5 rounded-full font-bold";
+            
+            showCatMessage("👑 喵嗚！完美通關！你現在是會計奇幻王國的大宗師啦！你成功的在歡樂中學會了核心50個會計名詞的秘密。繼續保持你的玩心與探索熱情吧！");
+        }
+
+        // --- SLIDE-OUT GLOSSARY CONTROL ---
+        function toggleGlossary() {
+            playSound('click');
+            const modal = document.getElementById('glossary-modal');
+            if (modal.classList.contains('opacity-0')) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('div').classList.remove('scale-95');
+                modal.querySelector('div').classList.add('scale-100');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.querySelector('div').classList.add('scale-95');
+                modal.querySelector('div').classList.remove('scale-100');
+            }
+        }
+    </script>
+</body>
+</html>
